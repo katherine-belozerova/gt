@@ -53,6 +53,26 @@ return [
                     ],
                     'except' => ['index', 'create', 'view', 'update', 'delete'],
                 ],
+                [
+                  'class' => 'yii\rest\UrlRule',
+                  'controller' => 'category',
+                  'pluralize' => false,
+                    'extraPatterns' => [
+                        'GET foo' => 'foo',
+                        'OPTIONS foo' => 'options',
+                    ],
+                    'except' => ['index', 'create', 'view', 'update', 'delete'],
+                ],
+                [
+                  'class' => 'yii\rest\UrlRule',
+                  'controller' => 'dish',
+                  'pluralize' => false,
+                    'extraPatterns' => [
+                        'GET foo' => 'foo',
+                        'OPTIONS foo' => 'options',
+                    ],
+                    'except' => ['index', 'create', 'view', 'update', 'delete'],
+                ],
             ],
         ],
     ],

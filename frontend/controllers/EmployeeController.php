@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
-use frontend\models\Employee;
+use frontend\models\Empl;
 use yii\filters\AccessControl;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -12,7 +12,8 @@ use yii\filters\auth\HttpBasicAuth;
 
 class EmployeeController extends ApiController
 {
-	public $modelClass = Employee::class;
+	public $modelClass = Empl::class;
+
 	public function behaviors()
 	{
 		$behaviors = parent::behaviors();
@@ -20,37 +21,69 @@ class EmployeeController extends ApiController
 			'class' => HttpBasicAuth::class,
 			'auth' => function ($login, $pass)
 			{
-				if ($user = Employee::find()->where(['login' => $login])->one() and !empty($pass) and $user->validatePassword($pass)) {
+				if ($user = Empl::find()
+					->where(['login' => $login])
+					->one() and 
+					!empty($pass) and 
+					$user->validatePassword($pass)) {
 					return $user;
 				} return null;
 			},
 		];
 		$behaviors['access'] = [
 			'class' => AccessControl::class,
-			'denyCallback' => function ($rule, $action) { throw new \Exception('У Вас нет прав для доступа к данной странице'); },
+			'denyCallback' => function ($rule, $action) 
+				{ 
+					throw new \Exception('У Вас нет прав для доступа к данной странице'); 
+				},
 			'rules' => [
 				[
-						'actions' => ['view', 'index', 'create', 'update'],
-						'allow' => false,
-						'roles' => ['?'],
+					'actions' => ['view', 'index', 'create', 'update', 'dismiss', 'return'],
+					'allow' => false,
+					'roles' => ['?'],
 				],
 				[
-						'actions' => ['view', 'index'],
-						'allow' => true,
-						'roles' => ['viewEmployee'],
+					'actions' => ['view', 'index'],
+					'allow' => true,
+					'roles' => ['viewEmployee'],
 				],
 				[
-                        'actions' => ['create'],
-                        'allow' => true,
-                        'roles' => ['createEmployee'],
+                    'actions' => ['create', 'dismiss', 'return'],
+                    'allow' => true,
+                    'roles' => ['createEmployee'],
                 ],
                 [
-                        'actions' => ['update'],
-                        'allow' => true,
-                        'roles' => ['updateEmployee'],
+                    'actions' => ['update', 'dismiss', 'return'],
+                    'allow' => true,
+                    'roles' => ['updateEmployee'],
                 ],
 			],
 		];
-		 return $behaviors;
-  }
+		 	return $behaviors;
+  	}
+
+  public function actionDismiss($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = 0;
+        $model->save(false);
+        return $this->redirect(['index']);
+    }
+
+    public function actionReturn($id)
+	{
+	    $model = $this->findModel($id);
+	    $model->status = 1;
+	    $model->save(false);
+	    return $this->redirect(['index']);
+	}
+
+  protected function findModel($id)
+    {
+        if (($model = Empl::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('Запрашиваемая страница не найдена');
+        }
+    }
 }

@@ -44,25 +44,25 @@ class Employee extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['role', 'surname', 'name', 'pas_ser', 'pas_num', 'dob', 'e_date', 'by_whom', 'when', 'email', 'tel', 'pass', 'login'], 'required', 'message' => 'Обязательное поле'],
+            [['role', 'surname', 'name', 'passport_series', 'passport_number', 'birth_date', 'date_of_employment', 'passport_issued_by', 'date_of_issue_of_passport', 'email', 'telephone', 'pass', 'login'], 'required', 'message' => 'Обязательное поле'],
 
-            [['pas_ser', 'pas_num'], 'integer'],
+            [['passport_series', 'passport_number'], 'integer'],
 
-            [['surname', 'name', 'pas_ser', 'pas_num', 'dob', 'e_date', 'by_whom', 'when', 'email', 'tel'], 'trim'],
+            [['surname', 'name', 'passport_series', 'passport_number', 'birth_date', 'date_of_employment', 'passport_issued_by', 'date_of_issue_of_passport', 'email', 'telephone'], 'trim'],
 
             [['role', 'login', 'pass'], 'string', 'max' => 16],
 
             [['surname', 'name', 'fathername'], 'string', 'max' => 64],
 
-            [['dob', 'e_date', 'when'], 'date', 'format' => 'dd.mm.yyyy', 'message' => 'Неверный формат даты (дд.мм.гггг)'],
+            [['birth_date', 'date_of_employment', 'date_of_issue_of_passport'], 'date', 'format' => 'dd.mm.yyyy', 'message' => 'Неверный формат даты (дд.мм.гггг)'],
 
-            [['by_whom', 'email'], 'string', 'max' => 128],
+            [['passport_issued_by', 'email'], 'string', 'max' => 128],
 
             [['status'], 'string', 'max' => 1],
 
             [['login'], 'unique', 'targetClass' => 'common\models\Employee', 'message' => 'Данный логин уже зарегистрирован, пожалуйста, придумайте другой'],
 
-            [['tel'], 'unique', 'targetClass' => 'common\models\Employee', 'message' => 'Данный телефон уже зарегистрирован'],
+            [['telephone'], 'unique', 'targetClass' => 'common\models\Employee', 'message' => 'Данный телефон уже зарегистрирован'],
 
             [['email'], 'unique', 'targetClass' => 'common\models\Employee', 'message' => 'Данный адрес электронной почты уже зарегистрирован'],
         ];
@@ -80,24 +80,23 @@ class Employee extends ActiveRecord implements IdentityInterface
             'name' => 'Имя',
             'fathername' => 'Отчество (если имеется)',
             'login' => 'Придумайте логин',
-            'pas_ser' => 'Серия паспорта',
-            'pas_num' => 'Номер паспорта',
-            'dob' => 'Дата рождения',
-            'e_date' => 'Дата приема на работу',
-            'by_whom' => 'Кем выдан',
-            'when' => 'Когда выдан',
+            'passport_series' => 'Серия паспорта',
+            'passport_number' => 'Номер паспорта',
+            'birth_date' => 'Дата рождения',
+            'date_of_employment' => 'Дата приема на работу',
+            'passport_issued_by' => 'Кем выдан',
+            'date_of_issue_of_passport' => 'Когда выдан',
             'email' => 'E-mail',
-            'tel' => 'Телефон',
+            'telephone' => 'Телефон',
             'pass' => 'Придумайте пароль',
         ];
     }
 
     public function beforeSave($insert)
     {
-        if(parent::beforeSave($insert))
-        {
-                $this->pass = Yii::$app->security->generatePasswordHash($this->pass);
-                return true;
+        if(parent::beforeSave($insert)) {
+            $this->pass = Yii::$app->security->generatePasswordHash($this->pass);
+            return true;
         }
         return false;
     }
@@ -109,15 +108,12 @@ class Employee extends ActiveRecord implements IdentityInterface
         $admin = $auth->getRole('admin');
         $director = $auth->getRole('director');
         $manager = $auth->getRole('manager');
-        if ($this->role == 'Администратор') 
-        {
-                $auth->assign($admin, $this->id); 
-        } else if ($this->role == 'Директор') 
-        {
-                $auth->assign($director, $this->id); 
-        } else if ($this->role == 'Менеджер') 
-        {
-                $auth->assign($manager, $this->id); 
+        if ($this->role == 'Администратор') {
+            $auth->assign($admin, $this->id); 
+        } else if ($this->role == 'Директор') {
+            $auth->assign($director, $this->id); 
+        } else if ($this->role == 'Менеджер') {
+            $auth->assign($manager, $this->id); 
         } 
 
     }

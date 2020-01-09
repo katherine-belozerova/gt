@@ -17,7 +17,8 @@ class ApiController extends ActiveController
     /**
      * @return array
      */
-    public function behaviors() {
+    public function behaviors() 
+    {
         return [
             'contentNegotiator' => [
                 'class' => \yii\filters\ContentNegotiator::class,
